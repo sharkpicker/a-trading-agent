@@ -1,3 +1,8 @@
+# Modifications Copyright 2026 sharkpicker
+# Original work Copyright TauricResearch
+# Licensed under the Apache License, Version 2.0.
+# See LICENSE for details.
+
 import os
 
 _TRADINGAGENTS_HOME = os.path.join(os.path.expanduser("~"), ".tradingagents")

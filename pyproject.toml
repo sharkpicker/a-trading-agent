@@ -1,3 +1,8 @@
+# Modifications Copyright 2026 sharkpicker
+# Original work Copyright TauricResearch
+# Licensed under the Apache License, Version 2.0.
+# See LICENSE for details.
+
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"

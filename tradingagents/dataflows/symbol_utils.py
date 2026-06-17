@@ -1,3 +1,8 @@
+# Modifications Copyright 2026 sharkpicker
+# Original work Copyright TauricResearch
+# Licensed under the Apache License, Version 2.0.
+# See LICENSE for details.
+
 """Symbol normalization and market-data error types for vendor calls.
 
 Yahoo Finance (the default vendor) uses specific ticker conventions that
