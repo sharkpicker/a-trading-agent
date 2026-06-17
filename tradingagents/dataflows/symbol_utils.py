@@ -11,6 +11,14 @@ differ from the broker / TradingView / MT5 style symbols users often type:
     BTCUSD            BTC-USD           crypto pairs use a ``-`` separator
     SPX500, US500     ^GSPC             index CFDs map to Yahoo index symbols
 
+A-Share (China stock) symbols are also supported:
+    user types        Canonical         exchange
+    ---------------   ---------------   -----------------------------------
+    000001            000001.SZ         Shenzhen
+    600000            600000.SS         Shanghai
+    688001            688001.SS         Shanghai STAR Market
+    300001            300001.SZ         Shenzhen ChiNext
+
 Passing the raw broker symbol to Yahoo returns an empty result, which the
 agents previously received as free text and could hallucinate a price
 around (see issue #781). Centralizing the mapping here means every yfinance
@@ -69,6 +77,14 @@ _ALIASES = {
     "FRA40": "^FCHI", "EU50": "^STOXX50E", "HK50": "^HSI",
 }
 
+# China A-Share exchange suffixes
+_CHINA_EXCHANGE_SUFFIXES = (".SS", ".SZ", ".BJ")
+
+# China A-Share code patterns: exchange determined by code prefix
+_CHINA_SH_PREFIXES = ("600", "601", "603", "605", "688")
+_CHINA_SZ_PREFIXES = ("000", "001", "002", "003", "300")
+_CHINA_BJ_PREFIXES = ("4", "8")
+
 # Yahoo symbols may contain letters, digits, and these structural characters.
 _YAHOO_SAFE = re.compile(r"^[A-Za-z0-9._\-\^=]+$")
 
@@ -96,15 +112,48 @@ def _normalize_crypto(s: str) -> str | None:
     return None
 
 
+def _resolve_china_exchange_by_code(code: str) -> str | None:
+    """Return the exchange suffix for a China A-Share numeric code.
+
+    Returns None if the code does not match any known A-Share pattern.
+    """
+    if not code.isdigit():
+        return None
+    if len(code) != 6:
+        return None
+    if code.startswith(_CHINA_SH_PREFIXES):
+        return f"{code}.SS"
+    if code.startswith(_CHINA_SZ_PREFIXES):
+        return f"{code}.SZ"
+    if code.startswith(_CHINA_BJ_PREFIXES):
+        return f"{code}.BJ"
+    return None
+
+
+def is_china_stock(symbol: str) -> bool:
+    """True when ``symbol`` is a China A-Share (has .SS/.SZ/.BJ suffix or
+    matches a known 6-digit A-Share code pattern)."""
+    if not symbol:
+        return False
+    s = symbol.strip().upper()
+    if s.endswith(_CHINA_EXCHANGE_SUFFIXES):
+        return True
+    # Check if it's a 6-digit numeric code that matches A-Share patterns
+    if len(s) == 6 and s.isdigit():
+        return _resolve_china_exchange_by_code(s) is not None
+    return False
+
+
 def normalize_symbol(raw: str) -> str:
-    """Map a user/broker symbol to its canonical Yahoo Finance symbol.
+    """Map a user/broker symbol to its canonical vendor symbol.
 
     Resolution order (first match wins):
-      1. Explicit alias table (metals, energy, index CFDs).
-      2. Crypto rule: a known crypto base quoted in USD/USDT/USDC (dashed or
+      1. China A-Share rule: 6-digit numeric code -> ``CODE.SS`` or ``CODE.SZ``.
+      2. Explicit alias table (metals, energy, index CFDs).
+      3. Crypto rule: a known crypto base quoted in USD/USDT/USDC (dashed or
          not) -> ``BASE-USD``.
-      3. Forex rule: six letters that are two ISO currency codes -> ``PAIR=X``.
-      4. Otherwise the upper-cased symbol is returned unchanged (plain
+      4. Forex rule: six letters that are two ISO currency codes -> ``PAIR=X``.
+      5. Otherwise the upper-cased symbol is returned unchanged (plain
          equities, ETFs, Yahoo-native symbols like ``GC=F`` or ``^GSPC``).
 
     A trailing ``+`` (broker CFD marker, e.g. ``XAUUSD+``) is stripped before
@@ -118,21 +167,54 @@ def normalize_symbol(raw: str) -> str:
     # Broker CFD/qualifier suffixes Yahoo never uses.
     s = s.rstrip("+")
 
-    crypto = _normalize_crypto(s)
-    if s in _ALIASES:
-        canonical = _ALIASES[s]
-    elif crypto is not None:
-        canonical = crypto
-    elif len(s) == 6 and s[:3] in _FOREX_CURRENCIES and s[3:] in _FOREX_CURRENCIES:
-        canonical = f"{s}=X"
-    else:
+    # 1. China A-Share: already has suffix or 6-digit numeric code
+    if s.endswith(_CHINA_EXCHANGE_SUFFIXES):
         canonical = s
+    elif len(s) == 6 and s.isdigit():
+        china_symbol = _resolve_china_exchange_by_code(s)
+        if china_symbol is not None:
+            canonical = china_symbol
+        else:
+            canonical = s
+    else:
+        crypto = _normalize_crypto(s)
+        if s in _ALIASES:
+            canonical = _ALIASES[s]
+        elif crypto is not None:
+            canonical = crypto
+        elif len(s) == 6 and s[:3] in _FOREX_CURRENCIES and s[3:] in _FOREX_CURRENCIES:
+            canonical = f"{s}=X"
+        else:
+            canonical = s
 
     if canonical != raw.strip().upper():
-        logger.info("Resolved symbol %r to Yahoo symbol %r", raw, canonical)
+        logger.info("Resolved symbol %r to canonical symbol %r", raw, canonical)
     return canonical
 
 
 def is_yahoo_safe(symbol: str) -> bool:
     """True when ``symbol`` only contains characters Yahoo symbols use."""
     return bool(symbol) and _YAHOO_SAFE.fullmatch(symbol) is not None
+
+
+def parse_china_symbol(symbol: str) -> tuple[str, str]:
+    """Parse a China A-Share symbol into (code, exchange_suffix).
+
+    Examples:
+        "000001.SZ" -> ("000001", ".SZ")
+        "600000.SS" -> ("600000", ".SS")
+        "000001"    -> ("000001", ".SZ")  # auto-resolved
+
+    Raises ValueError if the symbol cannot be parsed as a China A-Share.
+    """
+    canonical = normalize_symbol(symbol)
+    if not is_china_stock(canonical):
+        raise ValueError(f"'{symbol}' is not a recognized China A-Share symbol")
+
+    if canonical.endswith(_CHINA_EXCHANGE_SUFFIXES):
+        for suffix in _CHINA_EXCHANGE_SUFFIXES:
+            if canonical.endswith(suffix):
+                code = canonical[: -len(suffix)]
+                return code, suffix
+    # Should not reach here if is_china_stock passed
+    raise ValueError(f"Cannot parse China A-Share symbol: '{symbol}'")

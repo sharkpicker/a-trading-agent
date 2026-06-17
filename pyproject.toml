@@ -44,6 +44,12 @@ dev = [
 bedrock = [
     "langchain-aws>=1.5.0",
 ]
+# China A-Share support (mootdx + akshare). Optional so the core install
+# stays lean: pip install "tradingagents[china]".
+china = [
+    "mootdx>=0.1.0",
+    "akshare>=1.10.0",
+]
 
 [project.scripts]
 tradingagents = "cli.main:app"

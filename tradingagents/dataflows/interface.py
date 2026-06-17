@@ -30,6 +30,24 @@ from .y_finance import (
 )
 from .yfinance_news import get_global_news_yfinance, get_news_yfinance
 
+# China A-Share vendor imports (lazy-loaded to avoid hard dependency)
+try:
+    from .china_stock import (
+        get_stock_data as get_china_stock_data,
+        get_indicators_china,
+        get_fundamentals_china,
+        get_balance_sheet_china,
+        get_cashflow_china,
+        get_income_statement_china,
+        get_news_china,
+        get_global_news_china,
+        get_insider_transactions_china,
+        get_macro_indicators_china,
+    )
+    _CHINA_STOCK_AVAILABLE = True
+except ImportError:
+    _CHINA_STOCK_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 # Tools organized by category
@@ -82,6 +100,7 @@ VENDOR_LIST = [
     "fred",
     "polymarket",
     "alpha_vantage",
+    "china_stock",
 ]
 
 # Mapping of methods to their vendor-specific implementations
@@ -90,45 +109,55 @@ VENDOR_METHODS = {
     "get_stock_data": {
         "alpha_vantage": get_alpha_vantage_stock,
         "yfinance": get_YFin_data_online,
+        "china_stock": get_china_stock_data,
     },
     # technical_indicators
     "get_indicators": {
         "alpha_vantage": get_alpha_vantage_indicator,
         "yfinance": get_stock_stats_indicators_window,
+        "china_stock": get_indicators_china,
     },
     # fundamental_data
     "get_fundamentals": {
         "alpha_vantage": get_alpha_vantage_fundamentals,
         "yfinance": get_yfinance_fundamentals,
+        "china_stock": get_fundamentals_china,
     },
     "get_balance_sheet": {
         "alpha_vantage": get_alpha_vantage_balance_sheet,
         "yfinance": get_yfinance_balance_sheet,
+        "china_stock": get_balance_sheet_china,
     },
     "get_cashflow": {
         "alpha_vantage": get_alpha_vantage_cashflow,
         "yfinance": get_yfinance_cashflow,
+        "china_stock": get_cashflow_china,
     },
     "get_income_statement": {
         "alpha_vantage": get_alpha_vantage_income_statement,
         "yfinance": get_yfinance_income_statement,
+        "china_stock": get_income_statement_china,
     },
     # news_data
     "get_news": {
         "alpha_vantage": get_alpha_vantage_news,
         "yfinance": get_news_yfinance,
+        "china_stock": get_news_china,
     },
     "get_global_news": {
         "yfinance": get_global_news_yfinance,
         "alpha_vantage": get_alpha_vantage_global_news,
+        "china_stock": get_global_news_china,
     },
     "get_insider_transactions": {
         "alpha_vantage": get_alpha_vantage_insider_transactions,
         "yfinance": get_yfinance_insider_transactions,
+        "china_stock": get_insider_transactions_china,
     },
     # macro_data
     "get_macro_indicators": {
         "fred": get_fred_macro_data,
+        "china_stock": get_macro_indicators_china,
     },
     # prediction_markets
     "get_prediction_markets": {

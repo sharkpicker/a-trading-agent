@@ -101,12 +101,15 @@ DEFAULT_CONFIG = _apply_env_overrides({
     # The configured value is the exact vendor chain — requests are NOT silently
     # routed to vendors you didn't choose. For ordered fallback, list several,
     # e.g. "yfinance,alpha_vantage". "default" uses all available vendors.
+    #
+    # China A-Share: set data_vendors to "china_stock" for A-Share analysis.
+    # Requires: pip install -e ".[china]" (installs mootdx and akshare)
     "data_vendors": {
-        "core_stock_apis": "yfinance",       # Options: alpha_vantage, yfinance
-        "technical_indicators": "yfinance",  # Options: alpha_vantage, yfinance
-        "fundamental_data": "yfinance",      # Options: alpha_vantage, yfinance
-        "news_data": "yfinance",             # Options: alpha_vantage, yfinance
-        "macro_data": "fred",                # Options: fred (needs FRED_API_KEY)
+        "core_stock_apis": "yfinance",       # Options: alpha_vantage, yfinance, china_stock
+        "technical_indicators": "yfinance",  # Options: alpha_vantage, yfinance, china_stock
+        "fundamental_data": "yfinance",      # Options: alpha_vantage, yfinance, china_stock
+        "news_data": "yfinance",             # Options: alpha_vantage, yfinance, china_stock
+        "macro_data": "fred",                # Options: fred, china_stock (needs FRED_API_KEY for fred)
         "prediction_markets": "polymarket",  # Options: polymarket (keyless)
     },
     # Tool-level configuration (takes precedence over category-level)
