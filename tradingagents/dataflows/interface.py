@@ -192,8 +192,21 @@ def get_vendor(category: str, method: str = None) -> str:
     # Fall back to category-level configuration
     return config.get("data_vendors", {}).get(category, "default")
 
+def _is_china_symbol_from_args(args) -> bool:
+    """Detect if the first positional arg is a China A-Share symbol."""
+    if not args or not isinstance(args[0], str):
+        return False
+    from .symbol_utils import is_china_stock
+    return is_china_stock(args[0])
+
+
 def route_to_vendor(method: str, *args, **kwargs):
-    """Route method calls to appropriate vendor implementation with fallback support."""
+    """Route method calls to appropriate vendor implementation with fallback support.
+
+    For China A-Share symbols, automatically prioritises the ``china_stock``
+    vendor (if available) regardless of the global ``data_vendors`` setting,
+    so users do not need to manually switch configs when analysing A-shares.
+    """
     category = get_category_for_method(method)
     vendor_config = get_vendor(category, method)
     primary_vendors = [v.strip() for v in vendor_config.split(',')]
@@ -202,6 +215,13 @@ def route_to_vendor(method: str, *args, **kwargs):
         raise ValueError(f"Method '{method}' not supported")
 
     all_available_vendors = list(VENDOR_METHODS[method].keys())
+
+    # Auto-detect A-Share and prioritise china_stock vendor
+    is_ashare = _is_china_symbol_from_args(args)
+    if is_ashare and "china_stock" in all_available_vendors and _CHINA_STOCK_AVAILABLE:
+        # Prepend china_stock to the vendor chain so it is tried first
+        vendor_config = "china_stock," + vendor_config
+        primary_vendors = [v.strip() for v in vendor_config.split(',') if v.strip()]
 
     # The configured vendor list IS the chain: we do NOT silently fall back to
     # vendors the user did not choose (#988/#289) — that returned data from an

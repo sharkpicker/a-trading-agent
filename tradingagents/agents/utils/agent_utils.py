@@ -92,11 +92,20 @@ def resolve_instrument_identity(ticker: str) -> dict:
 
     The symbol is normalized first (e.g. ``XAUUSD`` -> ``GC=F``) so identity
     resolves for the same instrument the price path actually fetches (#983).
+
+    For China A-Share tickers, yfinance is skipped entirely to avoid
+    unnecessary rate-limiting (#china-stock).
     """
-    from tradingagents.dataflows.symbol_utils import normalize_symbol
+    from tradingagents.dataflows.symbol_utils import normalize_symbol, is_china_stock
+
+    canonical = normalize_symbol(ticker)
+
+    # Skip yfinance for China A-Share tickers — they have no Yahoo identity
+    if is_china_stock(canonical):
+        return {}
 
     try:
-        info = yf.Ticker(normalize_symbol(ticker)).info or {}
+        info = yf.Ticker(canonical).info or {}
     except Exception as exc:  # noqa: BLE001 — fail open, never block the run
         logger.debug("Could not resolve instrument identity for %s: %s", ticker, exc)
         return {}
