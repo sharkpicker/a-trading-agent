@@ -5,6 +5,8 @@
 > **Note:** This is a fork of [TradingAgents](https://github.com/TauricResearch/TradingAgents) by TauricResearch, with added China A-Share data support.
 > The original project is licensed under the Apache License, Version 2.0.
 > See [LICENSE](./LICENSE) and [NOTICE](./NOTICE) for details.
+>
+> **A-Share Fork:** https://github.com/sharkpicker/a-trading-agent
 
 <div align="center" style="line-height: 1;">
   <a href="https://arxiv.org/abs/2412.20138" target="_blank"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2412.20138-B31B1B?logo=arxiv"/></a>
@@ -107,10 +109,10 @@ Our framework decomposes complex trading tasks into specialized roles.
 
 ### Installation
 
-Clone TradingAgents:
+Clone this A-Share fork:
 ```bash
-git clone https://github.com/TauricResearch/TradingAgents.git
-cd TradingAgents
+git clone https://github.com/sharkpicker/a-trading-agent.git
+cd a-trading-agent
 ```
 
 Create a virtual environment in any of your favorite environment managers:
