@@ -22,10 +22,12 @@ from typing import Annotated
 
 from ..errors import NoMarketDataError
 from ..symbol_utils import normalize_symbol, parse_china_symbol
+from .rate_limiter import rate_limited_retry
 
 logger = logging.getLogger(__name__)
 
 
+@rate_limited_retry("mootdx", max_retries=2)
 def get_fundamentals(
     ticker: Annotated[str, "ticker symbol of the company"],
     curr_date: Annotated[str, "current date (not used for china stock)"] = None
@@ -82,6 +84,7 @@ def get_fundamentals(
         return f"Error retrieving fundamentals for {ticker}: {str(e)}"
 
 
+@rate_limited_retry("mootdx", max_retries=2)
 def get_balance_sheet(
     ticker: Annotated[str, "ticker symbol of the company"],
     freq: Annotated[str, "frequency of data: 'annual' or 'quarterly'"] = "quarterly",
@@ -114,6 +117,7 @@ def get_balance_sheet(
         return f"Error retrieving balance sheet for {ticker}: {str(e)}"
 
 
+@rate_limited_retry("mootdx", max_retries=2)
 def get_cashflow(
     ticker: Annotated[str, "ticker symbol of the company"],
     freq: Annotated[str, "frequency of data: 'annual' or 'quarterly'"] = "quarterly",
@@ -146,6 +150,7 @@ def get_cashflow(
         return f"Error retrieving cash flow for {ticker}: {str(e)}"
 
 
+@rate_limited_retry("mootdx", max_retries=2)
 def get_income_statement(
     ticker: Annotated[str, "ticker symbol of the company"],
     freq: Annotated[str, "frequency of data: 'annual' or 'quarterly'"] = "quarterly",

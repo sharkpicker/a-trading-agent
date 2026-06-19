@@ -20,9 +20,12 @@ import logging
 from datetime import datetime
 from typing import Annotated
 
+from .rate_limiter import rate_limited_retry
+
 logger = logging.getLogger(__name__)
 
 
+@rate_limited_retry("akshare", max_retries=2)
 def get_macro_indicators(
     indicators: Annotated[list[str], "list of macro indicators to fetch"] = None
 ):

@@ -25,10 +25,12 @@ import requests
 
 from ..errors import NoMarketDataError
 from ..symbol_utils import normalize_symbol, parse_china_symbol
+from .rate_limiter import rate_limited_retry
 
 logger = logging.getLogger(__name__)
 
 
+@rate_limited_retry("tencent", max_retries=2)
 def get_stock_data(
     symbol: Annotated[str, "ticker symbol of the company"],
     start_date: Annotated[str, "Start date in yyyy-mm-dd format"],

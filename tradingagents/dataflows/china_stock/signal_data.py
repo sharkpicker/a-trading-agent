@@ -30,6 +30,8 @@ from __future__ import annotations
 import logging
 from datetime import datetime, timedelta
 
+from .rate_limiter import rate_limited_retry
+
 logger = logging.getLogger(__name__)
 
 
@@ -50,6 +52,7 @@ def _try_akshare(fn):
 # Dragon-Tiger Board (龙虎榜)
 # ---------------------------------------------------------------------------
 
+@rate_limited_retry("akshare", max_retries=2)
 @_try_akshare
 def get_dragon_tiger_board(symbol: str, days: int = 5) -> str:
     """Get dragon-tiger board data for a stock.
@@ -87,6 +90,7 @@ def get_dragon_tiger_board(symbol: str, days: int = 5) -> str:
 # Northbound Capital Flow (北向资金)
 # ---------------------------------------------------------------------------
 
+@rate_limited_retry("akshare", max_retries=2)
 @_try_akshare
 def get_northbound_flow(symbol: str = "", days: int = 5) -> str:
     """Get northbound capital flow data via Stock Connect.
@@ -114,6 +118,7 @@ def get_northbound_flow(symbol: str = "", days: int = 5) -> str:
 # Concept Blocks (概念板块)
 # ---------------------------------------------------------------------------
 
+@rate_limited_retry("akshare", max_retries=2)
 @_try_akshare
 def get_concept_blocks(symbol: str = "") -> str:
     """Get concept/theme block data.
@@ -150,6 +155,7 @@ def get_concept_blocks(symbol: str = "") -> str:
 # Individual Stock Capital Flow (个股资金流)
 # ---------------------------------------------------------------------------
 
+@rate_limited_retry("akshare", max_retries=2)
 @_try_akshare
 def get_fund_flow(symbol: str, days: int = 5) -> str:
     """Get individual stock capital flow breakdown.
@@ -178,6 +184,7 @@ def get_fund_flow(symbol: str, days: int = 5) -> str:
 # Lockup Expiry (限售股解禁)
 # ---------------------------------------------------------------------------
 
+@rate_limited_retry("akshare", max_retries=2)
 @_try_akshare
 def get_lockup_expiry(symbol: str, days: int = 30) -> str:
     """Get upcoming restricted share unlock schedule.
@@ -211,6 +218,7 @@ def get_lockup_expiry(symbol: str, days: int = 30) -> str:
 # Hot Stocks (热门股)
 # ---------------------------------------------------------------------------
 
+@rate_limited_retry("akshare", max_retries=2)
 @_try_akshare
 def get_hot_stocks(market: str = "A") -> str:
     """Get currently hot/trending stocks with theme attribution.
@@ -234,6 +242,7 @@ def get_hot_stocks(market: str = "A") -> str:
 # Profit Forecast (一致预期)
 # ---------------------------------------------------------------------------
 
+@rate_limited_retry("akshare", max_retries=2)
 @_try_akshare
 def get_profit_forecast(symbol: str) -> str:
     """Get analyst consensus profit forecast (EPS estimates).
@@ -259,6 +268,7 @@ def get_profit_forecast(symbol: str) -> str:
 # Industry Comparison (行业横向对比)
 # ---------------------------------------------------------------------------
 
+@rate_limited_retry("akshare", max_retries=2)
 @_try_akshare
 def get_industry_comparison(symbol: str) -> str:
     """Get industry peer comparison data.

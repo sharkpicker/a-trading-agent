@@ -23,10 +23,12 @@ from typing import Annotated
 import pandas as pd
 
 from ..symbol_utils import normalize_symbol, parse_china_symbol
+from .rate_limiter import rate_limited_retry
 
 logger = logging.getLogger(__name__)
 
 
+@rate_limited_retry("akshare", max_retries=2)
 def get_news(
     ticker: Annotated[str, "ticker symbol of the company"],
     limit: Annotated[int, "max articles per ticker"] = 20
@@ -64,6 +66,7 @@ def get_news(
         return f"Error retrieving news for {ticker}: {str(e)}"
 
 
+@rate_limited_retry("akshare", max_retries=2)
 def get_global_news(
     queries: Annotated[list[str], "search queries for global news"] = None,
     limit: Annotated[int, "max articles for global news"] = 10,
@@ -115,6 +118,7 @@ def get_global_news(
         return f"Error retrieving global news: {str(e)}"
 
 
+@rate_limited_retry("akshare", max_retries=2)
 def get_insider_transactions(
     ticker: Annotated[str, "ticker symbol of the company"]
 ):
