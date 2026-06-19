@@ -160,6 +160,17 @@ class TradingAgentsGraph:
 
     def _create_tool_nodes(self) -> dict[str, ToolNode]:
         """Create tool nodes for different data sources using abstract methods."""
+        from tradingagents.agents.utils.signal_data_tools import (
+            get_dragon_tiger_board,
+            get_fund_flow,
+            get_hot_stocks,
+            get_industry_comparison,
+            get_lockup_expiry,
+            get_northbound_flow,
+            get_concept_blocks,
+            get_profit_forecast,
+        )
+
         return {
             "market": ToolNode(
                 [
@@ -196,6 +207,32 @@ class TradingAgentsGraph:
                     get_balance_sheet,
                     get_cashflow,
                     get_income_statement,
+                ]
+            ),
+            # A-Share specific tool nodes
+            "policy": ToolNode(
+                [
+                    # Policy analyst uses news and macro tools
+                    get_news,
+                    get_global_news,
+                    get_macro_indicators,
+                ]
+            ),
+            "hot_money": ToolNode(
+                [
+                    # Hot money tracker uses signal data tools
+                    get_dragon_tiger_board,
+                    get_northbound_flow,
+                    get_concept_blocks,
+                    get_fund_flow,
+                    get_industry_comparison,
+                ]
+            ),
+            "lockup": ToolNode(
+                [
+                    # Lockup watcher uses signal data tools
+                    get_lockup_expiry,
+                    get_hot_stocks,
                 ]
             ),
         }
@@ -425,6 +462,10 @@ class TradingAgentsGraph:
             "sentiment_report": final_state["sentiment_report"],
             "news_report": final_state["news_report"],
             "fundamentals_report": final_state["fundamentals_report"],
+            "policy_report": final_state.get("policy_report", ""),
+            "hot_money_report": final_state.get("hot_money_report", ""),
+            "lockup_report": final_state.get("lockup_report", ""),
+            "data_quality_summary": final_state.get("data_quality_summary", ""),
             "investment_debate_state": {
                 "bull_history": final_state["investment_debate_state"]["bull_history"],
                 "bear_history": final_state["investment_debate_state"]["bear_history"],

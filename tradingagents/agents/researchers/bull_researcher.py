@@ -24,8 +24,46 @@ def create_bull_researcher(llm):
             else "Asset fundamentals report (may be unavailable for crypto)"
         )
 
-        prompt = f"""You are a Bull Analyst advocating for investing in the {target_label}. Your task is to build a strong, evidence-based case emphasizing growth potential, competitive advantages, and positive market indicators. Leverage the provided research and data to address concerns and counter bearish arguments effectively.
+        # A-Share specific reports (may be empty for non-A-share tickers)
+        policy_report = state.get("policy_report", "")
+        hot_money_report = state.get("hot_money_report", "")
+        lockup_report = state.get("lockup_report", "")
+        data_quality_summary = state.get("data_quality_summary", "")
 
+        # Build A-Share specific framework section if reports are available
+        ashare_framework = ""
+        ashare_resources = ""
+        if policy_report or hot_money_report or lockup_report:
+            ashare_framework = (
+                "\nA-Share Bull Framework - prioritize these China-specific bullish catalysts:\n"
+                "- Policy Tailwinds: Government subsidies, industry support policies "
+                "(e.g. 'specialized and sophisticated' enterprises, national strategic sectors), "
+                "favorable regulatory signals from CSRC/State Council\n"
+                "- Northbound Capital: Sustained net inflow from Hong Kong Stock Connect "
+                "indicates foreign institutional conviction\n"
+                "- Hot Money Momentum: Consecutive limit-ups with volume confirmation, "
+                "strong theme attribution, sector rotation just beginning\n"
+                "- Valuation Growth Story: Use forward PE, PEG, and PE digestion timeframe "
+                "(30x anchor for A-share growth stocks) to argue the current premium is "
+                "justified by earnings trajectory\n"
+                "- Lockup Expiry Cleared: If major lockup periods have passed or insiders "
+                "are NOT reducing, this removes a key overhang\n\n"
+            )
+            ashare_resources = (
+                f"Policy analysis report: {policy_report}\n"
+                f"Hot money / capital flow report: {hot_money_report}\n"
+                f"Lockup expiry / insider reduction report: {lockup_report}\n"
+            )
+            if data_quality_summary:
+                ashare_resources += (
+                    f"Data quality assessment: {data_quality_summary}\n"
+                    "If the data quality assessment flags any report as low-confidence "
+                    "(grade C/D/F), reduce your reliance on that report and note the "
+                    "data limitation in your argument.\n"
+                )
+
+        prompt = f"""You are a Bull Analyst advocating for investing in the {target_label}. Your task is to build a strong, evidence-based case emphasizing growth potential, competitive advantages, and positive market indicators. Leverage the provided research and data to address concerns and counter bearish arguments effectively.
+{ashare_framework}
 Key points to focus on:
 - Growth Potential: Highlight the company's market opportunities, revenue projections, and scalability.
 - Competitive Advantages: Emphasize factors like unique products, strong branding, or dominant market positioning.
@@ -39,6 +77,7 @@ Market research report: {market_research_report}
 Social media sentiment report: {sentiment_report}
 Latest world affairs news: {news_report}
 {fundamentals_label}: {fundamentals_report}
+{ashare_resources}
 Conversation history of the debate: {history}
 Last bear argument: {current_response}
 Use this information to deliver a compelling bull argument, refute the bear's concerns, and engage in a dynamic debate that demonstrates the strengths of the bull position.

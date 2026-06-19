@@ -60,6 +60,14 @@ class AgentState(MessagesState):
     ]
     fundamentals_report: Annotated[str, "Report from the Fundamentals Researcher"]
 
+    # A-Share specific analyst reports
+    policy_report: Annotated[str, "Report from the Policy Analyst (A-stock specific)"]
+    hot_money_report: Annotated[str, "Report from the Hot Money Tracker (A-stock specific)"]
+    lockup_report: Annotated[str, "Report from the Lockup/Reduction Watcher (A-stock specific)"]
+
+    # data quality gate
+    data_quality_summary: Annotated[str, "Quality gate assessment of all analyst reports (hard checks + LLM review)"]
+
     # researcher team discussion step
     investment_debate_state: Annotated[
         InvestDebateState, "Current state of the debate on if to invest or not"

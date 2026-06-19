@@ -21,6 +21,19 @@ def create_neutral_debator(llm):
 
         trader_decision = state["trader_investment_plan"]
 
+        # A-Share specific reports
+        policy_report = state.get("policy_report", "")
+        hot_money_report = state.get("hot_money_report", "")
+        lockup_report = state.get("lockup_report", "")
+
+        ashare_resources = ""
+        if policy_report or hot_money_report or lockup_report:
+            ashare_resources = (
+                f"\nPolicy Analysis Report: {policy_report}\n"
+                f"Hot Money / Capital Flow Report: {hot_money_report}\n"
+                f"Lockup Expiry / Insider Reduction Report: {lockup_report}\n"
+            )
+
         prompt = f"""As the Neutral Risk Analyst, your role is to provide a balanced perspective, weighing both the potential benefits and risks of the trader's decision or plan. You prioritize a well-rounded approach, evaluating the upsides and downsides while factoring in broader market trends, potential economic shifts, and diversification strategies.Here is the trader's decision:
 
 {trader_decision}
@@ -32,6 +45,7 @@ Market Research Report: {market_research_report}
 Social Media Sentiment Report: {sentiment_report}
 Latest World Affairs Report: {news_report}
 Company Fundamentals Report: {fundamentals_report}
+{ashare_resources}
 Here is the current conversation history: {history} Here is the last response from the aggressive analyst: {current_aggressive_response} Here is the last response from the conservative analyst: {current_conservative_response}. If there are no responses from the other viewpoints yet, present your own argument based on the available data.
 
 Engage actively by analyzing both sides critically, addressing weaknesses in the aggressive and conservative arguments to advocate for a more balanced approach. Challenge each of their points to illustrate why a moderate risk strategy might offer the best of both worlds, providing growth potential while safeguarding against extreme volatility. Focus on debating rather than simply presenting data, aiming to show that a balanced view can lead to the most reliable outcomes. Output conversationally as if you are speaking without any special formatting.""" + get_language_instruction()

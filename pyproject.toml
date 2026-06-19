@@ -55,6 +55,10 @@ china = [
     "mootdx>=0.1.0",
     "akshare>=1.10.0",
 ]
+# Web UI support (Streamlit). Optional: pip install "tradingagents[web]".
+web = [
+    "streamlit>=1.30.0",
+]
 
 [project.scripts]
 tradingagents = "cli.main:app"

@@ -21,7 +21,38 @@ def create_aggressive_debator(llm):
 
         trader_decision = state["trader_investment_plan"]
 
+        # A-Share specific reports
+        policy_report = state.get("policy_report", "")
+        hot_money_report = state.get("hot_money_report", "")
+        lockup_report = state.get("lockup_report", "")
+
+        # Build A-Share framework if reports exist
+        ashare_framework = ""
+        ashare_resources = ""
+        if policy_report or hot_money_report or lockup_report:
+            ashare_framework = (
+                "\nA-Share Aggressive Framework - leverage these China-specific upside arguments:\n"
+                "- Limit-Up Momentum: In A-shares, consecutive limit-ups create powerful momentum; "
+                "T+1 actually helps by preventing same-day profit-taking, allowing multi-day runs\n"
+                "- Policy-Driven Sectors: When Beijing backs a sector (e.g. AI, chips, new energy), "
+                "the policy put is real - government support creates a floor\n"
+                "- Hot Money Conviction: When top hot money seats pile in with strong reason tags, "
+                "the short-term upside can be explosive\n"
+                "- Northbound Validation: If foreign institutions via Stock Connect are net buying "
+                "alongside domestic momentum, this dual confirmation is a strong signal\n"
+                "- PE Expansion Phase: In A-share bull cycles, PEs routinely expand to 50-100x for "
+                "thematic leaders; applying US-market valuation discipline too early means missing the main move\n"
+                "- Retail Sentiment Tailwind: A-shares are 80% retail; when sentiment turns positive, "
+                "the herd effect amplifies gains far beyond what fundamentals alone would suggest\n\n"
+            )
+            ashare_resources = (
+                f"\nPolicy Analysis Report: {policy_report}\n"
+                f"Hot Money / Capital Flow Report: {hot_money_report}\n"
+                f"Lockup Expiry / Insider Reduction Report: {lockup_report}\n"
+            )
+
         prompt = f"""As the Aggressive Risk Analyst, your role is to actively champion high-reward, high-risk opportunities, emphasizing bold strategies and competitive advantages. When evaluating the trader's decision or plan, focus intently on the potential upside, growth potential, and innovative benefits—even when these come with elevated risk. Use the provided market data and sentiment analysis to strengthen your arguments and challenge the opposing views. Specifically, respond directly to each point made by the conservative and neutral analysts, countering with data-driven rebuttals and persuasive reasoning. Highlight where their caution might miss critical opportunities or where their assumptions may be overly conservative. Here is the trader's decision:
+{ashare_framework}
 
 {trader_decision}
 
@@ -32,6 +63,7 @@ Market Research Report: {market_research_report}
 Social Media Sentiment Report: {sentiment_report}
 Latest World Affairs Report: {news_report}
 Company Fundamentals Report: {fundamentals_report}
+{ashare_resources}
 Here is the current conversation history: {history} Here are the last arguments from the conservative analyst: {current_conservative_response} Here are the last arguments from the neutral analyst: {current_neutral_response}. If there are no responses from the other viewpoints yet, present your own argument based on the available data.
 
 Engage actively by addressing any specific concerns raised, refuting the weaknesses in their logic, and asserting the benefits of risk-taking to outpace market norms. Maintain a focus on debating and persuading, not just presenting data. Challenge each counterpoint to underscore why a high-risk approach is optimal. Output conversationally as if you are speaking without any special formatting.""" + get_language_instruction()

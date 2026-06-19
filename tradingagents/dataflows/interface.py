@@ -48,6 +48,15 @@ try:
         get_global_news_china,
         get_insider_transactions_china,
         get_macro_indicators_china,
+        # Signal data
+        get_dragon_tiger_board_china,
+        get_northbound_flow_china,
+        get_concept_blocks_china,
+        get_fund_flow_china,
+        get_lockup_expiry_china,
+        get_hot_stocks_china,
+        get_profit_forecast_china,
+        get_industry_comparison_china,
     )
     _CHINA_STOCK_AVAILABLE = True
 except ImportError:
@@ -97,7 +106,21 @@ TOOLS_CATEGORIES = {
         "tools": [
             "get_prediction_markets",
         ]
-    }
+    },
+    # A-Share signal data (china_stock only)
+    "signal_data": {
+        "description": "A-Share specific signal data: dragon-tiger boards, northbound flow, concept blocks, fund flow, lockup expiry",
+        "tools": [
+            "get_profit_forecast",
+            "get_hot_stocks",
+            "get_northbound_flow",
+            "get_concept_blocks",
+            "get_fund_flow",
+            "get_dragon_tiger_board",
+            "get_lockup_expiry",
+            "get_industry_comparison",
+        ]
+    },
 }
 
 VENDOR_LIST = [
@@ -167,6 +190,31 @@ VENDOR_METHODS = {
     # prediction_markets
     "get_prediction_markets": {
         "polymarket": get_polymarket_prediction_markets,
+    },
+    # signal_data (china_stock only)
+    "get_profit_forecast": {
+        "china_stock": get_profit_forecast_china,
+    },
+    "get_hot_stocks": {
+        "china_stock": get_hot_stocks_china,
+    },
+    "get_northbound_flow": {
+        "china_stock": get_northbound_flow_china,
+    },
+    "get_concept_blocks": {
+        "china_stock": get_concept_blocks_china,
+    },
+    "get_fund_flow": {
+        "china_stock": get_fund_flow_china,
+    },
+    "get_dragon_tiger_board": {
+        "china_stock": get_dragon_tiger_board_china,
+    },
+    "get_lockup_expiry": {
+        "china_stock": get_lockup_expiry_china,
+    },
+    "get_industry_comparison": {
+        "china_stock": get_industry_comparison_china,
     },
 }
 

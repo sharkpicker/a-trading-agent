@@ -39,6 +39,22 @@ def create_portfolio_manager(llm):
             else ""
         )
 
+        # A-Share specific context
+        policy_report = state.get("policy_report", "")
+        hot_money_report = state.get("hot_money_report", "")
+        lockup_report = state.get("lockup_report", "")
+
+        ashare_context = ""
+        if policy_report or hot_money_report or lockup_report:
+            ashare_context = (
+                "\n\nA-Share Market Context:\n"
+                "- This is a China A-share stock subject to T+1 settlement, daily price limits, "
+                "and 100-share minimum lot size.\n"
+                "- Factor in policy risk (政策市), hot money dynamics, and lockup expiry pressure "
+                "from the analyst reports above when setting position sizing.\n"
+                "- Consider the data quality assessment when weighing report reliability.\n"
+            )
+
         prompt = f"""As the Portfolio Manager, synthesize the risk analysts' debate and deliver the final trading decision.
 
 {instrument_context}
@@ -58,6 +74,7 @@ def create_portfolio_manager(llm):
 {lessons_line}
 **Risk Analysts Debate History:**
 {history}
+{ashare_context}
 
 ---
 

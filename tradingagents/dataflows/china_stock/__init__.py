@@ -43,6 +43,16 @@ from .news import (
 from .macro import (
     get_macro_indicators as get_macro_indicators_china,
 )
+from .signal_data import (
+    get_dragon_tiger_board as get_dragon_tiger_board_china,
+    get_northbound_flow as get_northbound_flow_china,
+    get_concept_blocks as get_concept_blocks_china,
+    get_fund_flow as get_fund_flow_china,
+    get_lockup_expiry as get_lockup_expiry_china,
+    get_hot_stocks as get_hot_stocks_china,
+    get_profit_forecast as get_profit_forecast_china,
+    get_industry_comparison as get_industry_comparison_china,
+)
 
 # Re-export stockstats indicators (reuse yfinance implementation)
 from ..y_finance import get_stock_stats_indicators_window as get_indicators_china
@@ -71,4 +81,13 @@ __all__ = [
     "get_global_news_china",
     "get_insider_transactions_china",
     "get_macro_indicators_china",
+    # Signal data
+    "get_dragon_tiger_board_china",
+    "get_northbound_flow_china",
+    "get_concept_blocks_china",
+    "get_fund_flow_china",
+    "get_lockup_expiry_china",
+    "get_hot_stocks_china",
+    "get_profit_forecast_china",
+    "get_industry_comparison_china",
 ]
